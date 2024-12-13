@@ -8,30 +8,41 @@ local ServeCustomerRemote = Remotes:FindFirstChild("ServeCustomer")
 local BurgerToPlate = Remotes:FindFirstChild("BurgerToPlate")
 
 --Variables
+local CustomerModels = ServerStorage.Models.Customers
 local CustomersFolder = workspace:FindFirstChild("Customers")
+local CustomerAnchorPoint = workspace:FindFirstChild("CustomerAnchorPoint")
+
 local KitchenFolder = workspace:FindFirstChild("Kitchen")
 local KitchenBurger = KitchenFolder:FindFirstChild("Burger")
 
+--Functions
+function newCustomer()
+    -- Clear all existing customers
+    CustomersFolder:ClearAllChildren()
+    
+    -- Get a random customer model
+    local customerModels = CustomerModels:GetChildren()
+    local randomIndex = math.random(1, #customerModels)
+    local randomCustomerModel = customerModels[randomIndex]
+    
+    -- Clone the random customer model
+    local newCustomer = randomCustomerModel:Clone()
+    
+    -- Set the primary part of the new customer to the CustomerAnchorPoint
+    newCustomer:SetPrimaryPartCFrame(CustomerAnchorPoint.CFrame)
+    
+    -- Parent the new customer to the CustomersFolder
+    newCustomer.Parent = CustomersFolder
+end
+newCustomer()
 
 --Script
-ServeCustomerRemote.OnServerEvent:Connect(function(player)
-	local Customer = workspace.Customers.Test
-	if not Customer then
-		print("No customer found")
-		return
-	end
-	
-	local RequestedItem = Customer:FindFirstChild("RequestedItem")
-	if not RequestedItem then
-		print("The customer has no requested item")
-		return
-	end
-	
-	
+ServeCustomerRemote.OnServerEvent:Connect(function(player)		
 	local backpack = player:FindFirstChildOfClass("Backpack")
 	player.Character.Humanoid:UnequipTools()
 	backpack:ClearAllChildren()
 	print("Served customer")
+	newCustomer()
 end)
 
 BurgerToPlate.OnServerEvent:Connect(function(player, target)
