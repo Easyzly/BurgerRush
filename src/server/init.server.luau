@@ -14,7 +14,25 @@ local KitchenBurger = KitchenFolder:FindFirstChild("Burger")
 
 
 --Script
-
+ServeCustomerRemote.OnServerEvent:Connect(function(player)
+	local Customer = workspace.Customers.Test
+	if not Customer then
+		print("No customer found")
+		return
+	end
+	
+	local RequestedItem = Customer:FindFirstChild("RequestedItem")
+	if not RequestedItem then
+		print("The customer has no requested item")
+		return
+	end
+	
+	
+	local backpack = player:FindFirstChildOfClass("Backpack")
+	player.Character.Humanoid:UnequipTools()
+	backpack:ClearAllChildren()
+	print("Served customer")
+end)
 
 BurgerToPlate.OnServerEvent:Connect(function(player, target)
     -- Check if the target is KitchenBurger
