@@ -6,6 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = ReplicatedStorage:FindFirstChild("Remotes")
 local ServeCustomerRemote = Remotes:FindFirstChild("ServeCustomer")
 local BurgerToPlate = Remotes:FindFirstChild("BurgerToPlate")
+local StartGameRemote = Remotes:FindFirstChild("StartGame")
 
 --Variables
 local CustomerModels = ServerStorage.Models.Customers
@@ -14,6 +15,8 @@ local CustomerAnchorPoint = workspace:FindFirstChild("CustomerAnchorPoint")
 
 local KitchenFolder = workspace:FindFirstChild("Kitchen")
 local KitchenBurger = KitchenFolder:FindFirstChild("Burger")
+local KitchenSpawn = KitchenFolder:FindFirstChild("KitchenSpawn")
+local DeliveredCounter = 0
 
 --Functions
 function newCustomer()
@@ -34,7 +37,35 @@ function newCustomer()
     -- Parent the new customer to the CustomersFolder
     newCustomer.Parent = CustomersFolder
 end
-newCustomer()
+
+-- Kill the player and enable the StartScreenUI
+local function resetPlayer(player)
+    -- Kill the player
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.Health = 0
+    end
+
+    -- Enable the StartScreenUI
+    if player.PlayerGui:FindFirstChild("StartScreen") then
+        player.PlayerGui.StartScreen.Enabled = true
+    end
+end
+
+function endGame()
+    -- Clear all existing customers
+    CustomersFolder:ClearAllChildren()
+    
+    DeliveredCounter = 0
+        
+    local playerService = game:GetService("Players")
+    local players = playerService:GetPlayers()
+    
+    for _, player in pairs(players) do
+        resetPlayer(player)
+    end
+end
+
+
 
 --Script
 ServeCustomerRemote.OnServerEvent:Connect(function(player)		
@@ -42,6 +73,12 @@ ServeCustomerRemote.OnServerEvent:Connect(function(player)
 	player.Character.Humanoid:UnequipTools()
 	backpack:ClearAllChildren()
 	print("Served customer")
+	DeliveredCounter += 1
+	if DeliveredCounter >= 10 then
+		endGame()
+		return
+	end
+	
 	newCustomer()
 end)
 
@@ -60,4 +97,12 @@ BurgerToPlate.OnServerEvent:Connect(function(player, target)
             clonedBurgerPlated.Parent = backpack
         end
     end
+end)
+
+StartGameRemote.OnServerEvent:Connect(function(player)		
+    player.PlayerGui.StartScreen.Enabled = false
+    
+	player.Character:MoveTo(KitchenSpawn.Position)
+    
+    newCustomer()
 end)
