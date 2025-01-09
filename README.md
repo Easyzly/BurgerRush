@@ -1,11 +1,9 @@
 # BurgerRush
 
-Over dit Project
-
+## Over dit Project
 Dit project is gericht op het ontwikkelen van een Roblox-game. Tijdens het ontwikkelingsproces is ervoor gekozen om de game te beheren met behulp van Rojo, een tool die de Roblox Studio-omgeving koppelt aan een versiebeheersysteem zoals GitHub.
 
-Waarom zijn er weinig commits?
-
+## Waarom zijn er weinig commits?
 Er zijn slechts een beperkt aantal commits te vinden in deze repository. Dit komt door de beperkingen van Roblox en Rojo:
 
 Roblox en GitHub-integratie: Roblox biedt geen native ondersteuning voor GitHub of andere versiebeheersystemen. Dit maakt het lastig om wijzigingen in een Roblox-project rechtstreeks te volgen of op te slaan via GitHub.
