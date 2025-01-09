@@ -23,15 +23,18 @@ local timerRunning = false
 local countdownTimer
 
 --Functions
-local function startTimer()
+local function startTimer(player)
     if timerRunning then
         timer:Disconnect()
     end
 
     timerRunning = true
     countdownTimer = 10
+    local timerLabel = player.PlayerGui.GameScreen.TimerFrame.TimerLabel
+
     timer = game:GetService("RunService").Stepped:Connect(function(_, dt)
         countdownTimer = countdownTimer - dt
+        timerLabel.Text = string.format("Time left: %d", math.ceil(countdownTimer))
         if countdownTimer <= 0 then
             timerRunning = false
             endGame()
@@ -46,7 +49,7 @@ local function stopTimer()
     end
 end
 
-function newCustomer()
+local function newCustomer(player)
     -- Clear all existing customers
     CustomersFolder:ClearAllChildren()
     
@@ -65,7 +68,7 @@ function newCustomer()
     newCustomer.Parent = CustomersFolder
 
     -- Start the timer
-    startTimer()
+    startTimer(player)
 end
 
 -- Kill the player and enable the StartScreenUI
@@ -78,7 +81,12 @@ local function resetPlayer(player)
     -- Enable the StartScreenUI
     if player.PlayerGui:FindFirstChild("StartScreen") then
         player.PlayerGui.StartScreen.Enabled = true
-    end
+	end
+	
+	-- Disable the GameScreenUI
+	if player.PlayerGui:FindFirstChild("GameScreen") then
+		player.PlayerGui.GameScreen.Enabled = false
+	end
 end
 
 local function burgerMade()
@@ -117,7 +125,7 @@ ServeCustomerRemote.OnServerEvent:Connect(function(player)
 		return
 	end
 	
-	newCustomer()
+	newCustomer(player)
 end)
 
 BurgerToPlate.OnServerEvent:Connect(function(player, target)
@@ -141,9 +149,10 @@ BurgerToPlate.OnServerEvent:Connect(function(player, target)
 end)
 
 StartGameRemote.OnServerEvent:Connect(function(player)		
-    player.PlayerGui.StartScreen.Enabled = false
+	player.PlayerGui.StartScreen.Enabled = false
+	player.PlayerGui.GameScreen.Enabled = true
     
 	player.Character:MoveTo(KitchenSpawn.Position)
     
-    newCustomer()
+    newCustomer(player)
 end)
