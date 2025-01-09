@@ -18,7 +18,34 @@ local KitchenBurger = KitchenFolder:FindFirstChild("Burger")
 local KitchenSpawn = KitchenFolder:FindFirstChild("KitchenSpawn")
 local DeliveredCounter = 0
 
+local timer
+local timerRunning = false
+local countdownTimer
+
 --Functions
+local function startTimer()
+    if timerRunning then
+        timer:Disconnect()
+    end
+
+    timerRunning = true
+    countdownTimer = 10
+    timer = game:GetService("RunService").Stepped:Connect(function(_, dt)
+        countdownTimer = countdownTimer - dt
+        if countdownTimer <= 0 then
+            timerRunning = false
+            endGame()
+        end
+    end)
+end
+
+local function stopTimer()
+    if timerRunning then
+        timer:Disconnect()
+        timerRunning = false
+    end
+end
+
 function newCustomer()
     -- Clear all existing customers
     CustomersFolder:ClearAllChildren()
@@ -36,6 +63,9 @@ function newCustomer()
     
     -- Parent the new customer to the CustomersFolder
     newCustomer.Parent = CustomersFolder
+
+    -- Start the timer
+    startTimer()
 end
 
 -- Kill the player and enable the StartScreenUI
@@ -51,6 +81,11 @@ local function resetPlayer(player)
     end
 end
 
+local function burgerMade()
+    -- Call this function when a burger is made
+    stopTimer()
+end
+
 function endGame()
     -- Clear all existing customers
     CustomersFolder:ClearAllChildren()
@@ -63,6 +98,9 @@ function endGame()
     for _, player in pairs(players) do
         resetPlayer(player)
     end
+
+    -- Stop the timer if the game ends
+    stopTimer()
 end
 
 
@@ -96,6 +134,9 @@ BurgerToPlate.OnServerEvent:Connect(function(player, target)
             local clonedBurgerPlated = burgerPlated:Clone()
             clonedBurgerPlated.Parent = backpack
         end
+
+        -- Call burgerMade function
+        burgerMade()
     end
 end)
 
