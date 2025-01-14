@@ -1,6 +1,7 @@
 --Services
 local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 --Remotes
 local Remotes = ReplicatedStorage:FindFirstChild("Remotes")
@@ -21,6 +22,12 @@ local DeliveredCounter = 0
 local timer
 local timerRunning = false
 local countdownTimer
+
+--On player join
+Players.PlayerAdded:Connect(function(player)
+	print(player.Name .. " joined the game!")
+	player.PlayerGui:WaitForChild("StartScreen").Enabled = true
+end)
 
 --Functions
 local function startTimer(player)
